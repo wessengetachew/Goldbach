@@ -174,7 +174,6 @@
                  return;
             }
             // Check for reduced form (GCD(r,m) == 1) for the main theorem to hold.
-            // Note: GCD(0, m) = m, so we exclude r=0 from the GCD check if m>1.
             if (r !== 0 && gcd(r, m) !== 1) {
                  resultArea.innerHTML = '<span class="status-fail">Error: Input must be a **reduced** fraction (GCD(r, m) ≠ 1). Please reduce the fraction first.</span>';
                  return;
@@ -195,7 +194,7 @@
                         <strong>Condition Check:</strong>
                         <p>1. Reduced Fraction: <span class="math-expr">${r}/${m} = 1/2</span></p>
                         <p>2. Class Condition: <span class="math-expr">${r}/${m}</span> is congruent to <span class="math-expr">1/2 (mod 1)</span></p>
-                        <p>3. Angular Condition: $\\theta(${r}/${m}) = <span class="math-expr">${angle.toFixed(4)}</span> rad ($\mathbf{180^\circ}$) is congruent to $\pi$ (mod $2\pi$)</p>
+                        <p>3. Angular Condition: <span class="math-symbol">θ</span>(${r}/${m}) = <span class="math-expr">${angle.toFixed(4)}</span> rad ($\mathbf{180^\circ}$) is congruent to $\pi$ (mod $2\pi$)</p>
                     </div>
                 `;
             } else {
@@ -210,7 +209,7 @@
                         <strong>Condition Check:</strong>
                         <p>1. Reduced Fraction: <span class="math-expr">${r}/${m}</span> is not equal to <span class="math-expr">1/2</span></p>
                         <p>2. Class Condition: <span class="math-expr">${r}/${m}</span> is not congruent to <span class="math-expr">1/2 (mod 1)</span></p>
-                        <p>3. Angular Condition: $\\theta(${r}/${m}) = <span class="math-expr">${angle.toFixed(4)}</span> rad ($\mathbf{${angleDegrees.toFixed(2)}^\circ}$). This is not $\mathbf{180^\circ}$.</p>
+                        <p>3. Angular Condition: <span class="math-symbol">θ</span>(${r}/${m}) = <span class="math-expr">${angle.toFixed(4)}</span> rad ($\mathbf{${angleDegrees.toFixed(2)}^\circ}$). This is not $\mathbf{180^\circ}$.</p>
                     </div>
                 `;
             }
