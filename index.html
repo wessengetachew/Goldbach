@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Goldbach Conjecture Tester</title>
+    <title>Goldbach Conjecture Tester (v2)</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,7 +13,7 @@
             color: #333;
         }
         .container {
-            max-width: 600px;
+            max-width: 800px;
             margin: 0 auto;
             background: #fff;
             padding: 20px;
@@ -59,6 +60,19 @@
             font-size: 1.1em;
             font-weight: bold;
         }
+        #pairsList {
+            margin-top: 10px;
+            list-style: none;
+            padding: 0;
+            text-align: center;
+        }
+        #pairsList li {
+            display: inline-block;
+            margin: 0 5px;
+            padding: 2px 5px;
+            background-color: #f0f8ff;
+            border-radius: 3px;
+        }
         #csvTable {
             width: 100%;
             border-collapse: collapse;
@@ -84,38 +98,42 @@
 <body>
     <div class="container">
         <h1>Goldbach Conjecture Tester</h1>
-        <p>Enter an even integer greater than 2 to find a prime pair that sums to it.</p>
+        <p>Enter an even integer greater than 2 to find **all** prime pairs that sum to it.</p>
 
         <input type="number" id="numberInput" placeholder="Enter an even number N (e.g., 100)">
 
-        <button onclick="findGoldbachPair()">Test Goldbach</button>
+        <button onclick="findAllGoldbachPairs()">Test Goldbach</button>
 
         <div id="result">Enter a number above and click 'Test Goldbach'.</div>
+        <ul id="pairsList"></ul>
 
-        <h2>Test History</h2>
+        <h2>Test History (Smallest Prime $p_1$ Recorded)</h2>
         <button class="csv-export" onclick="exportToCSV()">Export History to CSV</button>
 
         <table id="csvTable">
             <thead>
                 <tr>
-                    <th>N (Even Number)</th>
-                    <th>Prime 1 ($p_1$)</th>
-                    <th>Prime 2 ($p_2$)</th>
+                    <th>N</th>
+                    <th>Count</th>
+                    <th>First Pair ($p_1+p_2$)</th>
                 </tr>
             </thead>
             <tbody>
                 </tbody>
         </table>
+
+        <h2>Smallest Prime Distribution (Graph)</h2>
+        <div style="width: 100%;"><canvas id="goldbachChart"></canvas></div>
+
     </div>
 
     <script>
-        // Array to store the history of successful tests
+        // Array to store the history of successful tests (one entry per N tested)
         let history = [];
+        let myChart; // Variable to hold the Chart.js instance
 
         /**
          * Checks if a number is prime.
-         * @param {number} num
-         * @returns {boolean}
          */
         function isPrime(num) {
             if (num <= 1) return false;
@@ -130,56 +148,140 @@
         }
 
         /**
-         * Finds the first Goldbach pair (p1 + p2 = N) where p1 <= p2.
+         * Finds ALL Goldbach pairs (p1 + p2 = N).
          */
-        function findGoldbachPair() {
+        function findAllGoldbachPairs() {
             const inputElement = document.getElementById('numberInput');
             const N = parseInt(inputElement.value);
             const resultDiv = document.getElementById('result');
+            const pairsList = document.getElementById('pairsList');
+            pairsList.innerHTML = ''; // Clear previous pairs
 
             if (isNaN(N) || N <= 2 || N % 2 !== 0) {
                 resultDiv.innerHTML = '<span style="color: red;">Please enter a valid **even** integer greater than 2.</span>';
                 return;
             }
-            
-            // Clear result while processing, especially for larger numbers
-            resultDiv.innerHTML = 'Searching for pair...';
 
-            // Start searching for the first prime (p1) from 2 up to N/2
+            resultDiv.innerHTML = 'Searching for pairs...';
+            
+            const pairs = [];
+            let firstP1 = null;
+
+            // Search for all pairs (p1 + p2 = N) where p1 <= p2
             for (let p1 = 2; p1 <= N / 2; p1++) {
                 if (isPrime(p1)) {
                     const p2 = N - p1;
                     if (isPrime(p2)) {
-                        // Found a pair!
-                        const resultText = `${N} = ${p1} + ${p2}`;
-                        resultDiv.innerHTML = `<span style="color: green;">✅ Goldbach Pair Found: <strong>${resultText}</strong></span>`;
-
-                        // Add to history and update table
-                        history.push({ N, p1, p2 });
-                        updateTable();
-                        return;
+                        pairs.push({ p1, p2 });
+                        if (firstP1 === null) {
+                            firstP1 = p1; // Record the smallest prime found
+                        }
                     }
                 }
             }
 
-            // If the loop completes, it means the conjecture failed for this N (highly unlikely)
-            resultDiv.innerHTML = `<span style="color: orange;">⚠️ Conjecture failed for N=${N}. This is unexpected based on current knowledge.</span>`;
+            if (pairs.length > 0) {
+                resultDiv.innerHTML = `<span style="color: green;">✅ Goldbach Pairs Found for ${N}! (Total: ${pairs.length} pairs)</span>`;
+                
+                // Display list of pairs
+                pairs.forEach(pair => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${pair.p1} + ${pair.p2}`;
+                    pairsList.appendChild(listItem);
+                });
+
+                // Add to history and update table/chart
+                history.push({ 
+                    N, 
+                    count: pairs.length, 
+                    firstP1: firstP1,
+                    firstPairString: `${pairs[0].p1} + ${pairs[0].p2}`
+                });
+                updateTable();
+                updateChart();
+            } else {
+                 // Highly unlikely for N > 2
+                resultDiv.innerHTML = `<span style="color: orange;">⚠️ No Goldbach pairs found for N=${N}. This violates the conjecture.</span>`;
+            }
         }
 
         /**
-         * Updates the HTML table with the current history.
+         * Updates the HTML history table.
          */
         function updateTable() {
             const tableBody = document.querySelector('#csvTable tbody');
-            
-            // Only add the latest item, no need to clear and redraw the whole table
             const item = history[history.length - 1];
+            
             if (item) {
                 const row = tableBody.insertRow(0); // Insert at the top
                 row.insertCell().textContent = item.N;
-                row.insertCell().textContent = item.p1;
-                row.insertCell().textContent = item.p2;
+                row.insertCell().textContent = item.count;
+                row.insertCell().textContent = item.firstPairString;
             }
+        }
+        
+        /**
+         * Updates the Chart.js graph showing the distribution of the smallest prime (p1).
+         */
+        function updateChart() {
+            // 1. Process history into chart data (Frequency Map)
+            const p1Frequencies = {};
+            history.forEach(item => {
+                const p1 = item.firstP1;
+                p1Frequencies[p1] = (p1Frequencies[p1] || 0) + 1;
+            });
+
+            // 2. Prepare Chart Data (Labels and Counts)
+            const labels = Object.keys(p1Frequencies).map(Number).sort((a, b) => a - b);
+            const data = labels.map(p1 => p1Frequencies[p1]);
+            
+            const ctx = document.getElementById('goldbachChart').getContext('2d');
+
+            if (myChart) {
+                myChart.destroy(); // Destroy existing chart before creating a new one
+            }
+
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Frequency of Smallest Prime (p1)',
+                        data: data,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Times p1 Appeared'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Smallest Prime (p1)'
+                            },
+                            ticks: {
+                                autoSkip: false, // Ensure all primes are shown if possible
+                                maxRotation: 90,
+                                minRotation: 45
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
         }
 
         /**
@@ -192,12 +294,11 @@
             }
 
             // Create CSV header
-            let csvContent = "N (Even Number),Prime 1 (p1),Prime 2 (p2)\n";
+            let csvContent = "N (Even Number),Pair Count,Smallest Prime (p1),First Pair\n";
 
             // Add data rows
-            // Note: History is exported in the order it was added (oldest first)
             history.forEach(item => {
-                csvContent += `${item.N},${item.p1},${item.p2}\n`;
+                csvContent += `${item.N},${item.count},${item.firstP1},"${item.firstPairString}"\n`;
             });
 
             // Create a Blob and a download link
@@ -206,7 +307,7 @@
             const link = document.createElement('a');
 
             link.setAttribute('href', url);
-            link.setAttribute('download', 'goldbach_test_results.csv');
+            link.setAttribute('download', 'goldbach_all_pairs_results.csv');
             link.style.visibility = 'hidden';
 
             document.body.appendChild(link);
