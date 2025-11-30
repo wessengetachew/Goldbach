@@ -3,487 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Goldbach Prime Tester | Clean Version</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <title>180° Channel Tester (Using Your LaTeX Logic)</title>
     <style>
-        /* --- GLOBAL STYLES & FONT --- */
+        /* --- GENERAL STYLES (Clean and Academic) --- */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f0f4f8; /* Light blue-gray background */
-            color: #2c3e50; /* Dark text */
+            background-color: #f0f4f8;
+            color: #2c3e50;
             line-height: 1.6;
         }
-        
-        /* --- CONTAINER & CARD EFFECT --- */
         .container {
-            max-width: 900px;
+            max-width: 700px;
             margin: 40px auto;
             background: #ffffff;
             padding: 30px 40px;
             border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Soft shadow */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
         
-        /* --- HEADINGS & TYPOGRAPHY --- */
+        /* --- HEADINGS --- */
         h1 {
-            font-family: 'Georgia', serif;
-            color: #e67e22; /* Warm orange/gold color */
+            color: #2980b9; /* Blue for Modulo */
             text-align: center;
-            font-size: 2.5em;
-            margin-bottom: 5px;
-            border-bottom: 3px solid #f39c12; /* Matching underline */
+            font-size: 2em;
+            border-bottom: 3px solid #3498db;
             padding-bottom: 10px;
         }
         h2 {
-            margin-top: 30px;
-            color: #34495e; /* Subdued dark blue */
-            font-size: 1.6em;
-            padding: 5px 0;
-            border-bottom: 1px solid #ddd;
-        }
-        p {
-            text-align: center;
-            font-size: 1.1em;
-            margin-bottom: 25px;
+            margin-top: 20px;
+            color: #34495e;
+            font-size: 1.4em;
         }
         
-        /* --- INPUT & BUTTON STYLES --- */
-        input[type="number"], button {
+        /* --- INPUT & BUTTONS --- */
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        input[type="number"] {
             padding: 12px;
-            margin: 10px 0;
             border-radius: 6px;
             border: 1px solid #bdc3c7;
-            width: 100%;
+            width: 50%;
             box-sizing: border-box;
             font-size: 1.1em;
-            transition: all 0.3s ease;
         }
-        input[type="number"]:focus {
-            border-color: #f39c12;
-            box-shadow: 0 0 5px rgba(243, 156, 18, 0.5);
-            outline: none;
-        }
-        
-        /* Main Test Button */
-        .test-button {
-            background-color: #2ecc71; /* Emerald Green */
+        button {
+            padding: 12px 25px;
+            border-radius: 6px;
+            border: none;
+            background-color: #f39c12; /* Orange/Gold for action */
             color: white;
             cursor: pointer;
+            font-size: 1.1em;
             font-weight: bold;
-            border: none;
+            transition: background-color 0.3s;
         }
-        .test-button:hover {
-            background-color: #27ae60;
-            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.4);
-        }
-        
-        /* CSV Export Button */
-        .csv-export {
-            background-color: #3498db; /* Peter River Blue */
-            margin-top: 10px;
-        }
-        .csv-export:hover {
-            background-color: #2980b9;
+        button:hover {
+            background-color: #e67e22;
         }
         
-        /* Toggle Button */
-        .toggle-button {
-            background-color: #7f8c8d; /* Gray */
-            width: auto !important;
-            padding: 8px 15px !important;
-            font-size: 0.95em !important;
-            margin: 10px auto 0 !important;
-            display: block; /* Center the button */
-        }
-        .toggle-button:hover {
-            background-color: #95a5a6;
-        }
-        
-        /* --- RESULT DISPLAY --- */
-        #result {
-            margin-top: 25px;
-            padding: 20px;
-            border-left: 5px solid #f39c12;
-            border-radius: 4px;
-            background-color: #fcf8e3; /* Light yellow background */
-            text-align: center;
-            font-size: 1.2em;
-            font-weight: 600;
-        }
-        #result strong {
-            color: #d35400; /* Carrot orange for emphasis */
-        }
-        
-        /* --- PAIRS LIST --- */
-        #pairsList {
-            margin-top: 15px;
-            list-style: none;
-            padding: 0;
-            text-align: center;
-        }
-        #pairsList li {
-            display: inline-block;
-            margin: 5px 8px;
-            padding: 5px 10px;
-            background-color: #ecf0f1; /* Light gray background for pairs */
-            border-radius: 4px;
-            font-family: monospace;
-            border: 1px solid #bdc3c7;
-        }
-        #pairsList .toggle-container {
-            display: block;
-            margin-top: 15px;
-        }
-        
-        /* --- TABLE STYLES --- */
-        #csvTable {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        #csvTable th, #csvTable td {
-            border: 1px solid #ecf0f1;
-            padding: 12px;
-            text-align: center;
-        }
-        #csvTable th {
-            background-color: #34495e;
-            color: white;
-            font-weight: normal;
-            text-transform: uppercase;
-            font-size: 0.9em;
-        }
-        #csvTable tbody tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        
-        /* --- CHART STYLES --- */
-        #goldbachChart {
+        /* --- RESULT AREA --- */
+        #result-area {
             margin-top: 20px;
-            padding: 10px;
+            padding: 20px;
+            border-left: 5px solid #2ecc71; /* Green success indicator */
+            border-radius: 4px;
+            background-color: #e8f8f5;
+        }
+        .status-success {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+        .status-fail {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        /* --- LOGIC DISPLAY --- */
+        .logic-box {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #ecf0f1;
+            border-radius: 6px;
+        }
+        .logic-box strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #34495e;
+        }
+        .math {
+            font-family: monospace;
             background-color: #ffffff;
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
+            padding: 2px 4px;
+            border-radius: 3px;
+            border: 1px solid #ddd;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Goldbach Conjecture Tester</h1>
-        <p>A stylish tool for exploring prime decomposition of even integers.</p>
-        
-        <input type="number" id="numberInput" placeholder="Enter an even number N (e.g., 100, 1000)" class="test-input">
-        
-        <button onclick="findAllGoldbachPairs()" class="test-button">Test Goldbach</button>
-        
-        <div id="result">Input a number above and click 'Test Goldbach' to begin.</div>
-        <ul id="pairsList"></ul>
+        <h1>180° Channel Tester ($\mathcal{C}_\pi$)</h1>
+        <p>Test if a rational class $r/m$ belongs to the channel, verifying the conditions established in your mathematical work.</p>
 
-        <hr> <h2>Distribution of Smallest Primes ($p_1$)</h2>
-        <div style="width: 100%; height: 350px;"><canvas id="goldbachChart"></canvas></div>
+        <p style="text-align:left; font-size: 0.9em;">
+            Enter a reduced rational $r/m$ ($0 \le r < m$)
+        </p>
 
-        <hr> <h2>Test History</h2>
-        <button class="csv-export" onclick="exportToCSV()">Export History to CSV</button>
-        
-        <table id="csvTable">
-            <thead>
-                <tr>
-                    <th>N</th>
-                    <th>Count</th>
-                    <th>First Pair ($p_1+p_2$)</th>
-                </tr>
-            </thead>
-            <tbody>
-                </tbody>
-        </table>
+        <div class="input-group">
+            <input type="number" id="numerator" placeholder="Numerator (r)" min="0">
+            <input type="number" id="denominator" placeholder="Denominator (m)" min="1">
+            <button onclick="checkChannel()">Test</button>
+        </div>
+
+        <div id="result-area">
+            Enter a fraction and click 'Test' to check the conditions.
+        </div>
+
+        <h2>Your Core Logic (from $\LaTeX$)</h2>
+        <div class="logic-box">
+            <p>A reduced rational $r/m$ is in $\mathcal{C}_\pi$ if and only if:</p>
+            
+            <p>1. **Angular Condition:** $\theta(r/m) \equiv \pi \pmod{2\pi}$</p>
+            <p>2. **Class Condition:** $r/m \equiv 1/2 \pmod 1$</p>
+            <p>3. **Reduced Fraction:** $r/m = 1/2$</p>
+        </div>
     </div>
 
     <script>
-        // Array to store the history of successful tests (one entry per N tested)
-        let history = [];
-        let myChart; // Variable to hold the Chart.js instance
-
         /**
-         * Checks if a number is prime.
+         * Calculates the Greatest Common Divisor (GCD) using the Euclidean algorithm.
          */
-        function isPrime(num) {
-            if (num <= 1) return false;
-            if (num <= 3) return true;
-            if (num % 2 === 0 || num % 3 === 0) return false;
-            let i = 5;
-            while (i * i <= num) {
-                if (num % i === 0 || num % (i + 2) === 0) return false;
-                i += 6;
+        function gcd(a, b) {
+            a = Math.abs(a);
+            b = Math.abs(b);
+            while (b) {
+                [a, b] = [b, a % b];
             }
-            return true;
+            return a;
         }
 
         /**
-         * Finds ALL Goldbach pairs (p1 + p2 = N).
+         * Checks the input fraction against the 180° Channel conditions.
          */
-        function findAllGoldbachPairs() {
-            const inputElement = document.getElementById('numberInput');
-            const N = parseInt(inputElement.value);
-            const resultDiv = document.getElementById('result');
-            const pairsList = document.getElementById('pairsList');
-            pairsList.innerHTML = ''; // Clear previous pairs
+        function checkChannel() {
+            const r = parseInt(document.getElementById('numerator').value);
+            const m = parseInt(document.getElementById('denominator').value);
+            const resultArea = document.getElementById('result-area');
 
-            if (isNaN(N) || N <= 2 || N % 2 !== 0) {
-                // EMOJI REMOVED: Replaced ❌ with plain text
-                resultDiv.innerHTML = '<span style="color: #c0392b;">Error: Please enter a valid **even** integer greater than 2.</span>';
+            // --- Input Validation ---
+            if (isNaN(r) || isNaN(m) || m <= 0) {
+                resultArea.innerHTML = '<span class="status-fail">Error: Please enter valid integer values (Denominator > 0).</span>';
                 return;
             }
-
-            // Check if N has already been tested
-            const existingEntry = history.find(item => item.N === N);
-            if (existingEntry) {
-                // EMOJI REMOVED: Replaced ℹ️ with plain text
-                resultDiv.innerHTML = '<span style="color: #2980b9;">Info: N=' + N + ' already tested. Total pairs: ' + existingEntry.count + '. Displaying previous results.</span>';
-                displayPairs(N, existingEntry.pairs);
-                return;
+            if (r < 0 || r >= m) {
+                 resultArea.innerHTML = '<span class="status-fail">Error: Input must satisfy the condition: $0 \le r < m$.</span>';
+                 return;
+            }
+            if (gcd(r, m) !== 1 && r !== 0) {
+                 resultArea.innerHTML = '<span class="status-fail">Error: Input must be a **reduced** fraction ($\gcd(r, m) = 1$).</span>';
+                 return;
             }
 
-            resultDiv.innerHTML = 'Searching for pairs...';
+            // --- Applying LaTeX Logic (Condition 3: r/m must be 1/2) ---
+            const isHalf = (r === 1 && m === 2);
             
-            const pairs = [];
-            let firstP1 = null;
+            let resultHTML = '';
 
-            // Search for all pairs (p1 + p2 = N) where p1 <= p2
-            for (let p1 = 2; p1 <= N / 2; p1++) {
-                if (isPrime(p1)) {
-                    const p2 = N - p1;
-                    if (isPrime(p2)) {
-                        pairs.push({ p1, p2 });
-                        if (firstP1 === null) {
-                            firstP1 = p1; // Record the smallest prime found
-                        }
-                    }
-                }
-            }
-
-            if (pairs.length > 0) {
-                // EMOJI REMOVED: Replaced ✅ with plain text
-                resultDiv.innerHTML = '<span style="color: #27ae60;">Success! Goldbach Pairs Found for ' + N + ' (Total: ' + pairs.length + ').</span>';
+            if (isHalf) {
+                // Condition 3 is TRUE
+                const angle = 2 * Math.PI * (r / m);
                 
-                // Display pairs with toggle
-                displayPairs(N, pairs);
-
-                // Add to history and update table/chart
-                history.push({ 
-                    N, 
-                    count: pairs.length, 
-                    firstP1: firstP1,
-                    firstPairString: `${pairs[0].p1} + ${pairs[0].p2}`,
-                    pairs: pairs
-                });
-                updateTable();
-                updateChart(); // Call the updated chart function
+                resultHTML = `
+                    <p class="status-success">The rational class ${r}/${m} is **IN** the 180° Channel ($\mathcal{C}_\pi$).</p>
+                    <div class="logic-box">
+                        <strong>Condition Check:</strong>
+                        <p>1. Reduced Fraction: <span class="math">${r}/${m} = 1/2</span></p>
+                        <p>2. Class Condition: <span class="math">${r}/${m} \equiv 1/2 \pmod 1</span></p>
+                        <p>3. Angular Condition: $\theta(${r}/${m}) = ${angle.toFixed(4)}$ rad ($180^{\circ}$) <span class="math">\equiv \pi \pmod{2\pi}</span></p>
+                    </div>
+                `;
             } else {
-                 // EMOJI REMOVED: Replaced ⚠️ with plain text
-                resultDiv.innerHTML = '<span style="color: #f39c12;">Warning: No Goldbach pairs found for N=' + N + '. This violates the conjecture.</span>';
-            }
-        }
-
-        /**
-         * Renders the list of Goldbach pairs with a "show more" toggle.
-         */
-        function displayPairs(N, pairs) {
-            const pairsList = document.getElementById('pairsList');
-            pairsList.innerHTML = ''; // Clear existing pairs
-
-            const limit = 5;
-            const total = pairs.length;
-            
-            // Function to create an individual pair list item
-            const createListItem = (p1, p2) => {
-                const listItem = document.createElement('li');
-                listItem.textContent = `${p1} + ${p2}`;
-                return listItem;
-            };
-
-            // 1. Display the first 5 pairs
-            for (let i = 0; i < Math.min(total, limit); i++) {
-                pairsList.appendChild(createListItem(pairs[i].p1, pairs[i].p2));
-            }
-
-            // 2. Add toggle for remaining pairs if total > 5
-            if (total > limit) {
-                const remainingPairs = pairs.slice(limit);
-
-                const toggleListItem = document.createElement('li');
-                toggleListItem.classList.add('toggle-container');
+                // Condition 3 is FALSE
+                const rationalValue = r / m;
+                const angle = 2 * Math.PI * rationalValue;
                 
-                const collapseDiv = document.createElement('div');
-                collapseDiv.id = `collapse-${N}`;
-                collapseDiv.style.display = 'none'; // Hidden by default
-                
-                // Add remaining pairs to the collapsible div
-                remainingPairs.forEach(pair => {
-                    collapseDiv.appendChild(createListItem(pair.p1, pair.p2));
-                });
-                
-                // Create the button to toggle visibility
-                const toggleButton = document.createElement('button');
-                toggleButton.textContent = `Show ${total - limit} More Pairs`;
-                toggleButton.classList.add('toggle-button');
-                toggleButton.onclick = function() {
-                    const isHidden = collapseDiv.style.display === 'none';
-                    collapseDiv.style.display = isHidden ? 'block' : 'none';
-                    toggleButton.textContent = isHidden ? `Hide ${total - limit} Pairs` : `Show ${total - limit} More Pairs`;
-                    toggleButton.style.backgroundColor = isHidden ? '#e74c3c' : '#7f8c8d'; /* Red/Gray toggle color change */
-                };
-
-                toggleListItem.appendChild(toggleButton);
-                toggleListItem.appendChild(collapseDiv);
-                pairsList.appendChild(toggleListItem);
-            }
-        }
-
-        /**
-         * Updates the HTML history table.
-         */
-        function updateTable() {
-            const tableBody = document.querySelector('#csvTable tbody');
-            const item = history[history.length - 1];
-            
-            // Check if item for N already exists in the table and skip if so (for re-testing same N)
-            const existingRow = Array.from(tableBody.rows).find(row => parseInt(row.cells[0].textContent) === item.N);
-            if (existingRow) return;
-
-            if (item) {
-                const row = tableBody.insertRow(0); // Insert at the top
-                row.insertCell().textContent = item.N;
-                row.insertCell().textContent = item.count;
-                row.insertCell().textContent = item.firstPairString;
-            }
-        }
-        
-        /**
-         * Updates the Chart.js graph showing the distribution of the smallest prime (p1).
-         */
-        function updateChart() {
-            // 1. Process history into chart data (Frequency Map)
-            const p1Frequencies = {};
-            let maxP1 = 0;
-            
-            history.forEach(item => {
-                const p1 = item.firstP1;
-                p1Frequencies[p1] = (p1Frequencies[p1] || 0) + 1;
-                if (p1 > maxP1) maxP1 = p1;
-            });
-
-            // 2. Prepare Chart Data (Labels and Counts)
-            const labels = Object.keys(p1Frequencies).map(Number).sort((a, b) => a - b);
-            const data = labels.map(p1 => p1Frequencies[p1]);
-            
-            const ctx = document.getElementById('goldbachChart').getContext('2d');
-
-            if (myChart) {
-                // If chart exists, update its data and labels (more stable redraw)
-                myChart.data.labels = labels;
-                myChart.data.datasets[0].data = data;
-                myChart.options.scales.x.max = maxP1 + 2; 
-                myChart.update();
-                
-            } else {
-                // If chart does not exist, create it (initial load)
-                myChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Frequency of Smallest Prime (p1)',
-                            data: data,
-                            backgroundColor: '#1abc9c', /* Turquoise bar color */
-                            borderColor: '#16a085',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false, 
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                precision: 0, 
-                                title: {
-                                    display: true,
-                                    text: 'Number of Times p1 Appeared',
-                                    color: '#34495e'
-                                },
-                                ticks: {
-                                    color: '#34495e'
-                                }
-                            },
-                            x: {
-                                beginAtZero: true,
-                                max: maxP1 + 2, 
-                                title: {
-                                    display: true,
-                                    text: 'Smallest Prime (p1)',
-                                    color: '#34495e'
-                                },
-                                ticks: {
-                                    color: '#34495e',
-                                    // Force ticks to only show integer primes
-                                    callback: function(value, index, ticks) {
-                                        if (value > 1 && isPrime(value)) {
-                                            return value;
-                                        }
-                                        return null; 
-                                    },
-                                    autoSkip: false,
-                                    maxRotation: 90,
-                                    minRotation: 45
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        }
-                    }
-                });
-                
-                // Set chart height after creation for better initial layout
-                document.getElementById('goldbachChart').style.height = '350px'; 
-            }
-        }
-
-        /**
-         * Exports the test history to a downloadable CSV file.
-         */
-        function exportToCSV() {
-            if (history.length === 0) {
-                alert("No history to export. Test some numbers first!");
-                return;
+                resultHTML = `
+                    <p class="status-fail">The rational class ${r}/${m} is **NOT** in the 180° Channel ($\mathcal{C}_\pi$).</p>
+                    <div class="logic-box">
+                        <strong>Condition Check:</strong>
+                        <p>1. Reduced Fraction: <span class="math">${r}/${m} \ne 1/2</span></p>
+                        <p>2. Class Condition: <span class="math">${r}/${m} \ne 1/2 \pmod 1</span></p>
+                        <p>3. Angular Condition: $\theta(${r}/${m}) = ${angle.toFixed(4)}$ rad. This is not $180^{\circ}$.</p>
+                    </div>
+                `;
             }
 
-            // Create CSV header
-            let csvContent = "N (Even Number),Pair Count,Smallest Prime (p1),First Pair\n";
-
-            // Add data rows
-            history.forEach(item => {
-                csvContent += `${item.N},${item.count},${item.firstP1},"${item.firstPairString}"\n`;
-            });
-
-            // Create a Blob and a download link
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-
-            link.setAttribute('href', url);
-            link.setAttribute('download', 'goldbach_all_pairs_results.csv');
-            link.style.visibility = 'hidden';
-
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            resultArea.innerHTML = resultHTML;
         }
     </script>
 </body>
 </html>
-
